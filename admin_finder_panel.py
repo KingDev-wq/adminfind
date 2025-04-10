@@ -35,7 +35,7 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
     print("\033[0m")
     print("\033[1;92m[ King Admin Finder Painel - V1.0 ]\033[0m\n")
 
-# Lista de caminhos
+# Lista de caminhos de admin comuns
 def carregar_paths():
     return [
         "admin", "admin/login", "login", "cpanel", "administrator", "adminarea", "user/login",
@@ -43,17 +43,15 @@ def carregar_paths():
         "admin1", "admin2", "adminpanel", "admin-console", "admin_area", "system/login", "admincontrol"
     ]
 
-# Verifica formulário de login
+# Verifica se há um formulário com input de senha
 def contem_login(html):
     soup = BeautifulSoup(html, 'html.parser')
     for form in soup.find_all('form'):
-        inputs = form.find_all('input')
-        for i in inputs:
-            if 'password' in str(i).lower():
-                return True
+        if any('password' in str(i).lower() for i in form.find_all('input')):
+            return True
     return False
 
-# Painel formatado
+# Exibe os resultados encontrados
 def painel_resultados(resultados):
     print("\n\033[1;94m+----------------------------------------+")
     print("|       PAINÉIS ENCONTRADOS (SCAN)       |")
@@ -65,7 +63,7 @@ def painel_resultados(resultados):
 
 # Função principal
 def admin_finder(base_url):
-    headers = {'User-Agent': 'Mozilla/5.0 (AdminFinder)'}
+    headers = {'User-Agent': 'Mozilla/5.0 (KingAdminFinder)'}
     achados = []
 
     print(f"\n\033[93m[+] Iniciando escaneamento de: {base_url}\033[0m\n")
@@ -83,14 +81,16 @@ def admin_finder(base_url):
                     print(f"\033[96m[~] Possível painel: {url}\033[0m")
             else:
                 print(f"\033[90m[-] {url} ({r.status_code})\033[0m")
-        except:
+        except Exception as e:
             print(f"\033[91m[!] Falha ao acessar: {url}\033[0m")
 
     painel_resultados(achados)
 
-# Execução
+# Execução principal
 if __name__ == "__main__":
     limpar()
     arte_ascii()
     alvo = input("\033[95m>> Digite a URL alvo (ex: https://site.com): \033[0m").strip()
+    if not alvo.startswith("http"):
+        alvo = "http://" + alvo
     admin_finder(alvo)
